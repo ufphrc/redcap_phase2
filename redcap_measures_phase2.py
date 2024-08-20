@@ -22,20 +22,12 @@ def main():
         # Filter DataFrame by date range
         df_filtered = filter_by_date(df, 'demo_screening_date', start_date, end_date)
 
-        # Sidebar: Radio button for filtering good readings
-        filter_option = st.sidebar.radio("Select option:", ('Only good readings', 'All'))
-
-        if filter_option == 'Only good readings':
-            df_filtered = df_filtered[df_filtered['good_readings'].notnull()]
-
-        # Final DataFrame after all filters
-        final_df = df_filtered
-
         # Sidebar: Visualization options
         st.sidebar.header("Visualization Options")
         visualization = st.sidebar.selectbox("Choose a visualization", 
                                              ['Eligibility Status', 'Demographics', 'Overall Health', 
-                                              'MoCA Score Distribution', 'Physical Measurements'])
+                                              'MoCA Score Distribution', 'Physical Measurements', 
+                                              'Participant Experience'])
 
         # Plot based on the user's selection
         if visualization == 'Eligibility Status':
@@ -48,7 +40,8 @@ def main():
             plot_moca_score(final_df)
         elif visualization == 'Physical Measurements':
             plot_physical_measurements(final_df)
-
+        elif visualization == 'Participant Experience':
+            plot_participant_experience(final_df)
 
 def filter_by_date(df, date_column, start_date, end_date):
     start_date = pd.to_datetime(start_date)
@@ -212,6 +205,40 @@ def plot_physical_measurements(df):
     ax.set_ylim(0, upper_limit)
     ax.set_yticks(np.arange(0, upper_limit, step=max(1, highest_count // 5)))
 
+    st.pyplot(fig)
+def plot_participant_experience(df):
+    # Calculate the averages of both 'pe_easy' and 'pe_valuable'
+    avg_pe_easy = df['pe_easy'].mean()
+    avg_pe_valuable = df['pe_valuable'].mean()
+
+    # Display the results
+    st.write(f"**Average ease of participation:** {avg_pe_easy:.2f}")
+    st.write(f"**Average perceived value:** {avg_pe_valuable:.2f}")
+
+    # Plot distribution of 'pe_easy'
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.histplot(df['pe_easy'], bins=10, kde=False, color='lightgreen', ax=ax)  # kde=False removes the KDE line
+    ax.set_title('Distribution of Ease of Use', fontsize=14)
+    ax.set_xlabel('Ease of Use', fontsize=12)
+    ax.set_ylabel('Frequency', fontsize=12)
+    add_value_labels(ax, df['pe_easy'])
+    adjust_yaxis(ax)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.grid(True)  # Enable the grid lines
+    st.pyplot(fig)
+
+    # Plot distribution of 'pe_valuable'
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.histplot(df['pe_valuable'], bins=10, kde=False, color='lightgreen', ax=ax)  # kde=False removes the KDE line
+    ax.set_title('Distribution of Perceived Value', fontsize=14)
+    ax.set_xlabel('Perceived Value', fontsize=12)
+    ax.set_ylabel('Frequency', fontsize=12)
+    add_value_labels(ax, df['pe_valuable'])
+    adjust_yaxis(ax)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.grid(True)  # Enable the grid lines
     st.pyplot(fig)
 
 
