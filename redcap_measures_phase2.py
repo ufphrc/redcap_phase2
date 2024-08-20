@@ -22,6 +22,16 @@ def main():
         # Filter DataFrame by date range
         df_filtered = filter_by_date(df, 'demo_screening_date', start_date, end_date)
 
+        
+            # Sidebar: Radio button for filtering good readings
+        filter_option = st.sidebar.radio("Select option:", ('Only good readings', 'All'))
+
+        if filter_option == 'Only good readings':
+            df_filtered = df_filtered[df_filtered['good_readings'].notnull()]
+
+        # Final DataFrame after all filters
+        final_df = df_filtered
+
         # Sidebar: Visualization options
         st.sidebar.header("Visualization Options")
         visualization = st.sidebar.selectbox("Choose a visualization", 
@@ -31,17 +41,17 @@ def main():
 
         # Plot based on the user's selection
         if visualization == 'Eligibility Status':
-            plot_eligibility_status(final_df)
+            plot_eligibility_status(df_filtered)
         elif visualization == 'Demographics':
-            plot_demographics(final_df)
+            plot_demographics(df_filtered)
         elif visualization == 'Overall Health':
-            plot_overall_health(final_df)
+            plot_overall_health(df_filtered)
         elif visualization == 'MoCA Score Distribution':
-            plot_moca_score(final_df)
+            plot_moca_score(df_filtered)
         elif visualization == 'Physical Measurements':
-            plot_physical_measurements(final_df)
+            plot_physical_measurements(df_filtered)
         elif visualization == 'Participant Experience':
-            plot_participant_experience(final_df)
+            plot_participant_experience(df_filtered)
 
 def filter_by_date(df, date_column, start_date, end_date):
     start_date = pd.to_datetime(start_date)
@@ -206,6 +216,7 @@ def plot_physical_measurements(df):
     ax.set_yticks(np.arange(0, upper_limit, step=max(1, highest_count // 5)))
 
     st.pyplot(fig)
+
 def plot_participant_experience(df):
     # Calculate the averages of both 'pe_easy' and 'pe_valuable'
     avg_pe_easy = df['pe_easy'].mean()
