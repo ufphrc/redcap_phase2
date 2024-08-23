@@ -8,7 +8,7 @@ import numpy as np
 # Define the Streamlit application
 def main():
     # File uploader for the master dataset
-    uploaded_file = st.file_uploader("Choose an Excel file", type="xlsx")
+    uploaded_file = st.file_uploader("Upload Master Data Excel file", type="xlsx")
     
     if uploaded_file is not None:
         # Load the Excel file
